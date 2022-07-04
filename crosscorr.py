@@ -92,10 +92,12 @@ def calculate_cl(mp1, mp2, msk1, msk2):
 def calculate_jkcl(PCL_fskydivided,jk_id):
     jkcl = []
     for i in range(n_jk_regions):
-        effectivemask = removing_region(jk_id,i, mask_full) 
+        print(i, n_jk_regions)
+        effectivemask = removing_region(jk_id,i, mask_full)
+        print(len(effectivemask))
         Cl = calculate_cl(gammamap_read,overdensity_read, effectivemask, effectivemask)
         jkcl.append(Cl)
-        return jkcl
+    return jkcl
         
 
 PCL_fskydivided = calculate_cl(gammamap_read,overdensity_read, mask_full, mask_full) #This is the Cl with no jackknife regions removed
@@ -105,35 +107,16 @@ print("JKCL Calculated")
 #with JKCL, we can calculate the jackknife error bars
 def calculate_errorbars(JKCL):
     n = len(JKCL)
-    mean_Cl = np.mean(JKCL)
-    jk_error = np.sqrt((n-1)*np.mean(JKCL-mean_Cl)*np.mean(JKCL-mean_Cl))
+    mean_Cl = np.mean(JKCL, axis=0)
+    jk_error = np.sqrt((n-1)*np.mean((JKCL-mean_Cl)**2, axis=0))
     return jk_error
 
 jack_error = calculate_errorbars(JKCL)
 
 print("Jackknife errors calculated")
+
+np.savez('FermiX_uno.npz',JKCL = JKCL, PCL_fskydivided = PCL_fskydivided, jack_error = jack_error)
+
 exit(1)
 
-def plot_power_spectrum_theory(filename, cls_data):
-    data =[]
-    datum = np.loadtxt(filename, unpack=True)
-    ls = datum[0]
-    cls = datum[1:]
-    for i in range(len(cls)):
-        fig, ax = plt.subplots()
-        ax.plot(ls, cls[i], 'k-')
-        ax.plot(ls, cls_data[i], 'r-')
-        ax.set_xlabel('l')
-        ax.set_ylabel('Cl')
-        ax.set_xscale('log')
-        ax.set_yscale('log')
 
-def calculate_cl_multi(maps, masks):
-    PCL_fsky = []
-    nmaps = len(maps)
-    for i1, (mp1, mask1) in enumerate(zip(maps, masks)):
-        for mp2, mask2 in zip(maps[i1:], masks[i1:]):
-            PCL_divided_byfsky = calculate_cl(mp1, mp2, mask1, mask2)
-            nside = hp.npix2nside(len(mp1))
-            PCL_fsky.append(PCL_divided_byfsky)
-    return PCL_fsky
