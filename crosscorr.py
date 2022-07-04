@@ -4,14 +4,31 @@ import kmeans_radec
 from kmeans_radec import KMeans, kmeans_sample
 import os.path
 from os.path import exists as file_exists 
+import argparse
+import matplotlib.pyplot as plt
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument('map_gal', type=str, help='Path to galaxy map')
+parser.add_argument('map_gamma', type=str, help='Path to gamma ray map')
+parser.add_argument('mask_gal', type=str, help='Path to galaxy mask')
+parser.add_argument('mask_gamma', type=str, help='Path to gamma ray mask')
+parser.add_argument('--nside', type=int,
+                    default=1024, help='Nside to use')
+parser.add_argument('--regions_name', type=str, default='None',
+                    help='Nside to use')
+parser.add_argument('--njk', type=int,
+                    default=100, help='# JK regions')
+args = parser.parse_args()
+
 
 #inputs (i.e maps and masks) to be used entered here
-gammamap_read = hp.readmap(input("Input gamma map"))
-overdensity_read =hp.read_map(input("Input overdensity map"))
-gammamask_read = hp.read_map(input("Input gamma map mask"))
-overdensitymask_read = hp.read_map(input("Input overdensity mask"))
-n_jk_regions = input("Input number of regions to apply Jackknife resampling")
-
+print("Reading maps")
+gammamap_read = hp.ud_grade(np.load(args.map_gamma), nside_out=args.nside)
+overdensity_read = hp.ud_grade(hp.read_map(args.map_gal), nside_out=args.nside)
+gammamask_read = hp.ud_grade(hp.read_map(args.mask_gamma), nside_out=args.nside)
+overdensitymask_read = hp.ud_grade(hp.read_map(args.mask_gal), nside_out=args.nside)
+n_jk_regions = args.njk
 
 
 #Gives total mask for two masks 
@@ -20,10 +37,12 @@ def get_total_mask(mask1,mask2):
     return total_mask
 
 
+print("Total mask")
 mask_full = get_total_mask(gammamask_read, overdensitymask_read)
+hp.mollview(gammamask_read)
+hp.mollview(overdensitymask_read)
+hp.mollview(mask_full)
 
-
-#get jk_ids (this function divides the mask into jackknife regions and labels them)
 
 def get_regions(mask, n_regions, unassigned=hp.UNSEEN):
     npix = len(mask)
@@ -41,15 +60,24 @@ def get_regions(mask, n_regions, unassigned=hp.UNSEEN):
 #unassigned are setting the unseen pixels in the mask, sets it equal to -1
 
 #check whether the jackknife region mask already exists
-def check_existence(filename):
-    if file_exists(filename) == False: 
-        jk_id_num = get_regions(filename, n_jk_regions, unassigned = -1)
-        np.savez(filename, jk_id_num = jk_id_num)
+def get_jk_ids(mask, filename):
+    if file_exists(filename):
+        data = np.load(filename)
+        jk_id_num = data['jk_id_num']
     else:
-        jk_id_num = np.load(filename)
+        jk_id_num = get_regions(mask, n_jk_regions, unassigned = -1)
+        if filename != 'None':
+            np.savez(filename, jk_id_num = jk_id_num)
+    return jk_id_num
 
-jk_id = check_existence("...")
-    
+
+print("Jackknife IDs")
+jk_id = get_jk_ids(mask_full, args.regions_name)
+
+hp.mollview(jk_id)
+plt.show()
+exit(1)
+
 #function removes the jackknife region from the mask so that we can apply the pseudo CL estimator to the rest of the map
 def removing_region(jk_id, label, mask_full): 
     mask_jk = mask_full.copy()
@@ -57,7 +85,6 @@ def removing_region(jk_id, label, mask_full):
     return mask_jk
 
 
-msk = hp.ud_grade(mask_full, nside_out = len(mask_full)) 
 #need the resolution to be the same because then mask_jk[jk_id_num==label]= 0 won't be 1-to-1
 
                
