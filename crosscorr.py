@@ -39,10 +39,6 @@ def get_total_mask(mask1,mask2):
 
 print("Total mask")
 mask_full = get_total_mask(gammamask_read, overdensitymask_read)
-hp.mollview(gammamask_read)
-hp.mollview(overdensitymask_read)
-hp.mollview(mask_full)
-
 
 def get_regions(mask, n_regions, unassigned=hp.UNSEEN):
     npix = len(mask)
@@ -74,10 +70,7 @@ def get_jk_ids(mask, filename):
 print("Jackknife IDs")
 jk_id = get_jk_ids(mask_full, args.regions_name)
 
-hp.mollview(jk_id)
-plt.show()
-exit(1)
-
+print("JackKnife IDs calculated")
 #function removes the jackknife region from the mask so that we can apply the pseudo CL estimator to the rest of the map
 def removing_region(jk_id, label, mask_full): 
     mask_jk = mask_full.copy()
@@ -99,27 +92,27 @@ def calculate_cl(mp1, mp2, msk1, msk2):
 def calculate_jkcl(PCL_fskydivided,jk_id):
     jkcl = []
     for i in range(n_jk_regions):
-        effectivemask = removing_region(jk_id_num[i], label, mask_full) 
+        effectivemask = removing_region(jk_id,i, mask_full) 
         Cl = calculate_cl(gammamap_read,overdensity_read, effectivemask, effectivemask)
         jkcl.append(Cl)
-    return jkcl
-    
-    
-    
-PCL_fskydivided = calculate_cl(gammamap_read,overdensity_read, total_mask, total_mask) #This is the Cl with no jackknife regions removed
-JKCL = calculate_jkcl(PCL_fskydivided, jk_id) #This is the jackknife Cl, i.e with each jackknife region removed
+        return jkcl
+        
 
+PCL_fskydivided = calculate_cl(gammamap_read,overdensity_read, mask_full, mask_full) #This is the Cl with no jackknife regions removed
+JKCL = calculate_jkcl(PCL_fskydivided, jk_id) #This is the jackknife Cl, i.e with each jackknife region removed
+print("JKCL Calculated")
 
 #with JKCL, we can calculate the jackknife error bars
 def calculate_errorbars(JKCL):
     n = len(JKCL)
     mean_Cl = np.mean(JKCL)
-    jk_error = np.sqrt((n-1)*np.mean(JKCL-mean_cl)*np.mean(JKCL-mean_cl))
+    jk_error = np.sqrt((n-1)*np.mean(JKCL-mean_Cl)*np.mean(JKCL-mean_Cl))
     return jk_error
 
 jack_error = calculate_errorbars(JKCL)
 
-
+print("Jackknife errors calculated")
+exit(1)
 
 def plot_power_spectrum_theory(filename, cls_data):
     data =[]
