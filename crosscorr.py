@@ -6,6 +6,7 @@ import os.path
 from os.path import exists as file_exists 
 import argparse
 import matplotlib.pyplot as plt
+import sys
 
 
 parser = argparse.ArgumentParser()
@@ -19,11 +20,13 @@ parser.add_argument('--regions_name', type=str, default='None',
                     help='Nside to use')
 parser.add_argument('--njk', type=int,
                     default=100, help='# JK regions')
+parser.add_argument('--namefile' , type=str, help ='File name to save as')
 args = parser.parse_args()
 
 
 #inputs (i.e maps and masks) to be used entered here
 print("Reading maps")
+sys.stdout.flush()
 gammamap_read = hp.ud_grade(np.load(args.map_gamma), nside_out=args.nside)
 overdensity_read = hp.ud_grade(hp.read_map(args.map_gal), nside_out=args.nside)
 gammamask_read = hp.ud_grade(hp.read_map(args.mask_gamma), nside_out=args.nside)
@@ -38,6 +41,7 @@ def get_total_mask(mask1,mask2):
 
 
 print("Total mask")
+sys.stdout.flush()
 mask_full = get_total_mask(gammamask_read, overdensitymask_read)
 
 def get_regions(mask, n_regions, unassigned=hp.UNSEEN):
@@ -68,6 +72,7 @@ def get_jk_ids(mask, filename):
 
 
 print("Jackknife IDs")
+sys.stdout.flush()
 jk_id = get_jk_ids(mask_full, args.regions_name)
 
 print("JackKnife IDs calculated")
@@ -103,7 +108,7 @@ def calculate_jkcl(PCL_fskydivided,jk_id):
 PCL_fskydivided = calculate_cl(gammamap_read,overdensity_read, mask_full, mask_full) #This is the Cl with no jackknife regions removed
 JKCL = calculate_jkcl(PCL_fskydivided, jk_id) #This is the jackknife Cl, i.e with each jackknife region removed
 print("JKCL Calculated")
-
+sys.stdout.flush()
 #with JKCL, we can calculate the jackknife error bars
 def calculate_errorbars(JKCL):
     n = len(JKCL)
@@ -114,8 +119,10 @@ def calculate_errorbars(JKCL):
 jack_error = calculate_errorbars(JKCL)
 
 print("Jackknife errors calculated")
-
-np.savez('FermiX_uno.npz',JKCL = JKCL, PCL_fskydivided = PCL_fskydivided, jack_error = jack_error)
+sys.stdout.flush()
+name = args.namefile
+filename = "%s.npz" % name
+np.savez(filename,JKCL = JKCL, PCL_fskydivided = PCL_fskydivided, jack_error = jack_error)
 
 exit(1)
 
