@@ -7,7 +7,7 @@ from os.path import exists as file_exists
 import argparse
 import matplotlib.pyplot as plt
 import sys
-
+import pymaster as nmt
 
 parser = argparse.ArgumentParser()
 parser.add_argument('map_gal', type=str, help='Path to galaxy map')
@@ -17,12 +17,21 @@ parser.add_argument('mask_gamma', type=str, help='Path to gamma ray mask')
 parser.add_argument('--nside', type=int,
                     default=1024, help='Nside to use')
 parser.add_argument('--regions_name', type=str, default='None',
-                    help='Nside to use')
+                    help='Name of jk regions file')
 parser.add_argument('--njk', type=int,
                     default=100, help='# JK regions')
 parser.add_argument('--namefile' , type=str, help ='File name to save as')
+parser.add_argument('--use_namaster', default=False, action='store_true',
+                    help='Use namaster instead of anafast')
 args = parser.parse_args()
 
+if args.use_namaster:
+    print("Creating bins")
+    sys.stdout.flush()
+    b = nmt.NmtBin.from_nside_linear(args.nside, 20)
+    ells = b.get_effective_ells()
+else:
+    ells = np.arange(3*args.nside)
 
 #inputs (i.e maps and masks) to be used entered here
 print("Reading maps")
@@ -87,11 +96,27 @@ def removing_region(jk_id, label, mask_full):
 
                
 #computing the data points i.e calculates Cl
-def calculate_cl(mp1, mp2, msk1, msk2):
-    PCL = hp.anafast(mp1*msk1, mp2*msk2)
-    fsky  = np.mean(msk1*msk2)
-    ell = len(PCL)
-    return PCL/fsky
+def calculate_cl(mp1, mp2, msk1, msk2, return_bpw=False):
+    if args.use_namaster:
+        f_gal = nmt.NmtField(msk1,[mp1], n_iter=0)
+        f_gam = nmt.NmtField(msk2, [mp2], n_iter=0)
+        PCL = nmt.compute_coupled_cell(f_gal,f_gam)
+        w = nmt.NmtWorkspace()
+        w.compute_coupling_matrix(f_gal, f_gam, b)
+        cl = w.decouple_cell(PCL)
+        if return_bpw:
+            bpw = w.get_bandpower_windows()
+    else:
+        PCL = hp.anafast(mp1*msk1, mp2*msk2)
+        fsky  = np.mean(msk1*msk2)
+        ell = len(PCL)
+        cl = PCL/fsky
+        if return_bpw:
+            bpw = np.eye(3*args.nside)
+    if return_bpw:
+        return cl, bpw
+    else:
+        return cl
 
 #calculates Cl with the desired jackknife region removed                      
 def calculate_jkcl(PCL_fskydivided,jk_id):
@@ -105,7 +130,7 @@ def calculate_jkcl(PCL_fskydivided,jk_id):
     return jkcl
         
 
-PCL_fskydivided = calculate_cl(gammamap_read,overdensity_read, mask_full, mask_full) #This is the Cl with no jackknife regions removed
+bpw, PCL_fskydivided = calculate_cl(gammamap_read,overdensity_read, mask_full, mask_full, return_bpw=True) #This is the Cl with no jackknife regions removed
 JKCL = calculate_jkcl(PCL_fskydivided, jk_id) #This is the jackknife Cl, i.e with each jackknife region removed
 print("JKCL Calculated")
 sys.stdout.flush()
@@ -122,7 +147,7 @@ print("Jackknife errors calculated")
 sys.stdout.flush()
 name = args.namefile
 filename = "%s.npz" % name
-np.savez(filename,JKCL = JKCL, PCL_fskydivided = PCL_fskydivided, jack_error = jack_error)
+np.savez(filename, ells=ells, JKCL = JKCL, PCL_fskydivided = PCL_fskydivided, jack_error = jack_error, bpw=bpw)
 
 exit(1)
 
