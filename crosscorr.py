@@ -130,7 +130,7 @@ def calculate_jkcl(PCL_fskydivided,jk_id):
     return jkcl
         
 
-bpw, PCL_fskydivided = calculate_cl(gammamap_read,overdensity_read, mask_full, mask_full, return_bpw=True) #This is the Cl with no jackknife regions removed
+PCL_fskydivided, bpw = calculate_cl(gammamap_read,overdensity_read, mask_full, mask_full, return_bpw=True) #This is the Cl with no jackknife regions removed
 JKCL = calculate_jkcl(PCL_fskydivided, jk_id) #This is the jackknife Cl, i.e with each jackknife region removed
 print("JKCL Calculated")
 sys.stdout.flush()
