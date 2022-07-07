@@ -28,8 +28,8 @@ args = parser.parse_args()
 if args.use_namaster:
     print("Creating bins")
     sys.stdout.flush()
-    b = nmt.NmtBin.from_edges(bpw_edges[:-1], bpw_edges[1:])
     bpw_edges = [0, 30, 60, 90, 120, 150, 180, 210, 240, 272, 309, 351, 398, 452, 513, 582, 661, 750, 852, 967, 1098, 1247, 1416, 1608, 1826, 2073, 2354, 2673, 3071]
+    b = nmt.NmtBin.from_edges(bpw_edges[:-1], bpw_edges[1:])
     ells = b.get_effective_ells()
 else:
     ells = np.arange(3*args.nside)
