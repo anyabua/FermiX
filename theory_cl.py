@@ -1,4 +1,13 @@
-
+import matplotlib.pyplot as plt
+%matplotlib inline
+import healpy as hp
+import numpy as np
+import kmeans_radec
+from kmeans_radec import KMeans, kmeans_sample
+import os.path
+from os.path import exists as file_exists
+import pymaster as nmt
+import matplotlib.cm as cm
 import pyccl as ccl
 
 z, dndz = np.loadtxt("dndz_bin1.txt", unpack=True)
