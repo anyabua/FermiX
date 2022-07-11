@@ -15,9 +15,13 @@ z, dndz = np.loadtxt("dndz_bin1.txt", unpack=True)
 #bpw_edges = [0, 30, 60, 90, 120, 150, 180, 210, 240, 272, 309, 351, 398, 452, 513, 582, 661, 750, 852, 967, 1098, 1247, 1416, 1608, 1826, 2073, 2354, 2673, 3071]
 #b = nmt.NmtBin.from_edges(bpw_edges[:-1], bpw_edges[1:])
 #ells = b.get_effective_ells()
-
 #print(len(ells))
+
+a = 1./(1+z)
+chi = ccl.comoving_radial_distance(cosmo,a)
 ells = np.geomspace(2,1000,150)
+#k =  (ells + 0.5)/chi
+
 
 #need to add halo model stuff to get Pks
 cosmo = ccl.CosmologyVanillaLCDM()
@@ -41,10 +45,6 @@ cosmo = ccl.CosmologyVanillaLCDM()
 
 my_tracer = ccl.Tracer()
 
-a = 1./(1+z)
-#print(a)
-chi = ccl.comoving_radial_distance(cosmo,a)
-#k_arr = (ells+0.5)/chi
 
 # Galaxy clustering
 t_g = ccl.NumberCountsTracer(cosmo, has_rsd = False, dndz=(z,dndz), bias=(z, np.ones_like(z)))
@@ -65,15 +65,18 @@ def try_kernel(alpha,chi,z):
             gamma_kernel_and_chi = [chi,kernel]
             return gamma_kernel_and_chi
 
-gamma_kernel = try_kernel(3,chi,z) #kernel needs to be a tuple of 2 arrays. Not sure what the second array should be.
-#print(notsure)
+gamma_kernel = try_kernel(3,chi,z)
+
 
             
-plt.plot(notsure[0],notsure[1])
+plt.plot(gamma_kernel[0],gamma_kernel[1])
 plt.xlabel('$\\chi\\,[{\\rm Mpc}]$',fontsize=14)
 plt.ylabel('$q(\\chi)$',fontsize=14)
 plt.show()
 
 UGRB = my_tracer.add_tracer(cosmo, kernel = gamma_kernel, transfer_a = None)
 cl_theory = ccl.angular_cl(cosmo, UGRB, g_kernel, ells, p_of_k = pk_gg)
-#need p_of_k from halo model 
+#need p_of_k from halo model
+plt.figure()
+plt.plot(ells, cl_theory, 'y-')
+plt.yscale('log')
