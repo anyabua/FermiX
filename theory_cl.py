@@ -27,6 +27,11 @@ a_arr = (a)[::-1] #makes scale factor monotonically increasing
 chi = ccl.comoving_radial_distance(cosmo,a_arr)
 
 
+
+
+
+
+
 ########## HALO MODEL STUFF FROM GITHUB ###########
 
 # We will use a mass definition with Delta = 200 times the matter density
@@ -131,7 +136,10 @@ pk_ggf = ccl.halos.halomod_Pk2D(cosmo, hmc, pg, prof_2pt=HOD2pt, normprof1=True,
 
 
 
-GRB_tracer = ccl.Tracer()
+
+
+
+CGB_tracer = ccl.Tracer()
 
 
 # Galaxy clustering
@@ -163,9 +171,9 @@ plt.xlabel('$\\chi\\,[{\\rm Mpc}]$',fontsize=14)
 plt.ylabel('$q_\\gamma(\\chi)$',fontsize=14)
 plt.show()
 
-GRB_tracer.add_tracer(cosmo, kernel = gamma_kernel)
+CGB_tracer.add_tracer(cosmo, kernel = gamma_kernel)
 
-cl_theory = ccl.angular_cl(cosmo, GRB_tracer , t_g, ells, p_of_k_a = pk_ggf) #uses Limber approx
+cl_theory = ccl.angular_cl(cosmo, CGB_tracer , t_g, ells, p_of_k_a = pk_ggf) #uses Limber approx
 
 plt.figure()
 plt.plot(ells, cl_theory, 'y-')
