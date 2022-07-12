@@ -152,7 +152,7 @@ t_g = ccl.NumberCountsTracer(cosmo, has_rsd = False, dndz=(z,dndz), bias=(z, np.
 g_kernel = ccl.get_density_kernel(cosmo, (z,dndz))
 
 
-plt.plot(chi,g_kernel[1])
+plt.plot(g_kernel[0],g_kernel[1])
 plt.xlabel('$\\chi\\,[{\\rm Mpc}]$',fontsize=14)
 plt.ylabel('$q_\\delta(\\chi)$',fontsize=14)
 plt.show()
