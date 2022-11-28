@@ -1,7 +1,5 @@
 import numpy as np
 import healpy as hp
-import kmeans_radec
-from kmeans_radec import KMeans, kmeans_sample
 import os.path
 from os.path import exists as file_exists 
 import argparse
