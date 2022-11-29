@@ -1,7 +1,4 @@
 import numpy as np
-import healpy as hp
-import os.path
-from os.path import exists as file_exists 
 import argparse
 import matplotlib.pyplot as plt
 import sys
