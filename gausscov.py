@@ -77,7 +77,10 @@ def calculate_gausscov(f_gal,f_gam,PCL_galgam,PCL_galgal,PCL_gamgam):
     w = nmt.NmtWorkspace()
     w.compute_coupling_matrix(f_gal,f_gam,b)
     cw = nmt.NmtCovarianceWorkspace()
-    cw.compute_coupling_coefficients(f_gal,f_gam,flb1 = None,flb2 = None)
+    cw.compute_coupling_coefficients(f_gal,f_gam,flb1 = None,flb2 = None,lmax = 3*args.nside)
+    print(PCL_gamgam.shape)
+    print(PCL_galgal.shape)
+    print(PCL_galgam.shape)
     full_cov = nmt.gaussian_covariance(cw,0,0,0,0,[PCL_galgal],[PCL_galgam],[PCL_galgam],[PCL_gamgam],w,wb = w, coupled =True).reshape([ells,1,ells,1])
     return full_cov
         
