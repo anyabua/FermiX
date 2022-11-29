@@ -75,7 +75,7 @@ def calculate_cl(mp1, mp2, msk1, msk2, return_bpw=False):
 
 def calculate_gausscov(f_gal,f_gam,PCL_galgam,PCL_galgal,PCL_gamgam):
     cw = nmt.NmtCovarianceWorkspace()
-    cw.compute_coupling_coefficients(f_gal,f_gam,f_gal,f_gam)
+    cw.compute_coupling_coefficients(f_gal,f_gam,None,None)
     full_cov = nmt.gaussian_covariance(cw, 0,0,0,0,[PCL_galgal],[PCL_galgam],[PCL_galgam],[PCL_gamgam],w,wb = w)
     return full_cov
         
