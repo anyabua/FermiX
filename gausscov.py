@@ -45,10 +45,10 @@ sys.stdout.flush()
 mask_full = get_total_mask(gammamask_read, overdensitymask_read)
                
 #computing the data points i.e calculates Cl
-def calculate_cl(mp1, mp2,mask_full):
-    fsky = np.mean(mask_full)
-    f_gal = nmt.NmtField(mask_full,[mp1], n_iter=0)
-    f_gam = nmt.NmtField(mask_full, [mp2], n_iter=0)
+def calculate_cl(mp1, mp2,mask1,mask2):
+    fsky = np.mean(mask1*mask2)
+    f_gal = nmt.NmtField(mask1,[mp1], n_iter=0)
+    f_gam = nmt.NmtField(mask2, [mp2], n_iter=0)
     PCL_galgam = nmt.compute_coupled_cell(f_gal,f_gam)/fsky
     PCL_galgal = nmt.compute_coupled_cell(f_gal,f_gal)/fsky
     PCL_gamgam = nmt.compute_coupled_cell(f_gam,f_gam)/fsky
@@ -59,11 +59,11 @@ def calculate_gausscov(f_gal,f_gam,PCL_galgam,PCL_galgal,PCL_gamgam):
     w.compute_coupling_matrix(f_gal,f_gam,b)
     cw = nmt.NmtCovarianceWorkspace()
     cw.compute_coupling_coefficients(f_gal,f_gam,flb1 = None,flb2 = None,lmax = (3*args.nside)-1)
-    full_cov = nmt.gaussian_covariance(cw,0,0,0,0,PCL_galgal,PCL_galgam,PCL_galgam,PCL_gamgam,w,wb = w, coupled =True)
-    return full_cov
+    gauss_cov = nmt.gaussian_covariance(cw,0,0,0,0,PCL_galgal,PCL_galgam,PCL_galgam,PCL_gamgam,w,wb = w, coupled =True)
+    return gauss_cov
         
 
-PCL_galgam,PCL_galgal, PCL_gamgam, f_gal, f_gam = calculate_cl(gammamap_read,overdensity_read,mask_full) #This is the Cl with no jackknife regions removed
+PCL_galgam,PCL_galgal, PCL_gamgam, f_gal, f_gam = calculate_cl(gammamap_read,overdensity_read,mask_full,mask_full) #This is the Cl with no jackknife regions removed
 print("Gaussian Covariance")
 gauss_cov = calculate_gausscov(f_gal,f_gam,PCL_galgam,PCL_galgal,PCL_gamgam)
 print("Gaussian Covariance calculated")
