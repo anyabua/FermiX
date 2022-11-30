@@ -1,4 +1,5 @@
 import numpy as np
+import healpy as hp 
 import argparse
 import matplotlib.pyplot as plt
 import sys
@@ -41,7 +42,7 @@ print("Total mask")
 sys.stdout.flush()
 mask_full = get_total_mask(gammamask_read, overdensitymask_read)
                
-#computing the data points i.e calculates Cl
+
 def calculate_cl(mp1, mp2,mask1,mask2):
     fsky = np.mean(mask1*mask2)
     f_gal = nmt.NmtField(mask1,[mp1], n_iter=0)
@@ -51,6 +52,7 @@ def calculate_cl(mp1, mp2,mask1,mask2):
     PCL_gamgam = nmt.compute_coupled_cell(f_gam,f_gam)/fsky
     return PCL_galgam, PCL_galgal, PCL_gamgam, f_gal,f_gam
 
+#calculating the gaussian covariance. Create two workspaces where one stores the coupling coefficients of the two fields and the other computes the mode coupling matrix. 
 def calculate_gausscov(f_gal,f_gam,PCL_galgam,PCL_galgal,PCL_gamgam):
     w = nmt.NmtWorkspace()
     w.compute_coupling_matrix(f_gal,f_gam,b)
@@ -60,14 +62,14 @@ def calculate_gausscov(f_gal,f_gam,PCL_galgam,PCL_galgal,PCL_gamgam):
     return gauss_cov
         
 
-PCL_galgam,PCL_galgal, PCL_gamgam, f_gal, f_gam = calculate_cl(gammamap_read,overdensity_read,mask_full,mask_full) #This is the Cl with no jackknife regions removed
+PCL_galgam,PCL_galgal, PCL_gamgam, f_gal, f_gam = calculate_cl(overdensity_read,gammamap_read,mask_full,mask_full) 
 print("Gaussian Covariance")
 gauss_cov = calculate_gausscov(f_gal,f_gam,PCL_galgam,PCL_galgal,PCL_gamgam)
 print("Gaussian Covariance calculated")
 sys.stdout.flush()
 name = args.namefile
 filename = "%s.npz" % name
-np.savez(filename, ells=ells,gauss_cov = gauss_cov)
+np.savez(filename, ells=ells,PCL_galgam = PCL_galgam, PCL_galgal = PCL_galgal,PCL_gamgam = PCL_gamgam, gauss_cov = gauss_cov)
 
 exit(1)
 
