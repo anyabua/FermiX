@@ -14,6 +14,6 @@ The notebooks (Fmeasurements_example.ipynb and Astrohysical_example.ipynb) accom
 If you use the data or the methods presented in the paper, we kindly ask you to cite it. 
 
 
-If you have any questions or issues with the data, feel free to reach out to the authors directly: 
+If you have any questions or issues with the data, feel free to open an issue here or reach out to the authors directly: 
   * Anya Paopiamsap (@anyabua)
   * David Alonso (@damonge)
