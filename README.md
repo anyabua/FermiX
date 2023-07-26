@@ -15,5 +15,5 @@ If you use the data or the methods presented in the paper, we kindly ask you to 
 
 
 If you have any questions or issues with the data, feel free to reach out to the authors directly: 
-*Anya Paopiamsap @anyabua
-*David Alonso @damonge
+* Anya Paopiamsap @anyabua
+* David Alonso @damonge
