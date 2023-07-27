@@ -7,8 +7,9 @@ In this repository you will find:
 ## The data folder
 This folder contains 4 data files: the F measurements for the case of annihliation in three different substructure reigmes (SC14, M16, G12), decay, and emissivity measurements.
 
+
 ## Notebooks
-The notebooks [Astrophysical_example](FermiX/blob/main/Astrophysical_example.ipynb) and [Fmeasurements_example](FermiX/blob/main/Fmeasurements_example.ipynb) accompanies the data folder by showing the user how to extract information from the data files. The supplementary notebooks [Extracting_F_from_Cls_Decay](FermiX/blob/main/Extracting_F_from_Cls_Decay.ipynb) and [Extracting_F_from_Cls_Annihilation](FermiX/blob/main/Extracting_F_from_Cls_Annihilation.ipynb) shows how these F measurements were obtained from our raw gamma-ray cross-correlations.
+The notebooks [Astrophysical_example](/Astrophysical_example.ipynb) and [Fmeasurements_example](/Fmeasurements_example.ipynb) accompanies the data folder by showing the user how to extract information from the data files. The supplementary notebooks [Extracting_F_from_Cls_Decay](/Extracting_F_from_Cls_Decay.ipynb) and [Extracting_F_from_Cls_Annihilation](/Extracting_F_from_Cls_Annihilation.ipynb) shows how these F measurements were obtained from our raw gamma-ray cross-correlations.
 
 ## Credit and Feedback 
 If you use the data or the methods presented in the paper, we kindly ask you to cite it. 
