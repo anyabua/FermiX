@@ -1,6 +1,6 @@
 # FermiX
 
-This repository containts the F and astrophysical emissivity measurements, as well as example notebooks on its usage, from its companion paper "Constraints on dark matter and astrophysics from tomographic $\gamma$-ray cross-correlations." Both quantities (F and the astroyphysical emissivity) are defined in Section II D 3. The paper uses these F measurements extracted from raw cross-correlations to obtain constraints on the velocity-averaged annihilation rate and the decay rate for dark matter annihilation and decay repsectively. 
+This repository contains the F and astrophysical emissivity measurements, as well as example notebooks on its usage, from its companion paper "Constraints on dark matter and astrophysics from tomographic $\gamma$-ray cross-correlations." Both quantities, F and the astroyphysical emissivity, are defined in Section II D 3 and Section II E of the paper respectively. On the one hand, the F measurements extracted from the raw cross-correlations have been used in the paper to put constraints on the velocity-averaged annihilation rate and the decay rate for dark matter annihilation and decay respectively. On the other hand, the astrophysical emissivity measurements have been used to put constraints on the energy and redshift dependence of the detected $\gamma$-ray emissivity without assuming a particular origin.
 
 In this repository you will find: 
 
