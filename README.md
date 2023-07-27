@@ -5,7 +5,7 @@ This repository contains the F and astrophysical emissivity measurements, as wel
 In this repository you will find: 
 
 ## The data folder
-[This folder](/main/data) contains 4 data files: the F measurements for the case of annihliation in three different substructure reigmes (SC14, M16, G12), decay, and emissivity measurements.
+[This folder](data) contains 4 data files: the F measurements for the case of annihliation in three different substructure reigmes (SC14, M16, G12), decay, and emissivity measurements.
 
 
 ## Notebooks
